@@ -71,14 +71,16 @@ h1 {
 button {
   margin: 0.25em;
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid #ccc;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: transparent;
   cursor: pointer;
   transition: border-color 0.25s;
+  color: #fff;
+  margin: 1rem;
 }
 button:hover {
   border-color: #646cff;
@@ -88,7 +90,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: #213547;) {
   :root {
     color: #213547;
     background-color: #ffffff;
