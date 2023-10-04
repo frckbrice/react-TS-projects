@@ -1,10 +1,12 @@
 
 
 import {
-  useState,
   useReducer,
   createContext,
   ChangeEvent,
+  ReactElement,
+  useCallback,
+  useContext,
 } from "react";
 
 type StateType = {
@@ -12,10 +14,10 @@ type StateType = {
   text: string;
 }
 
-const initState: StateType = {
+export const initState: StateType = {
   count: 0,
-  text: "",
-};
+  text: '',
+}
 
 const enum REDUCER_ACTION_TYPE {
   INCREMENT,
@@ -47,17 +49,23 @@ const useCounterContext =  (initState: StateType) => {
 
   const [state, dispatch] = useReducer(reducer, initState);
 
-  const increment = () => {
+  const increment = useCallback(() => {
     dispatch({type: REDUCER_ACTION_TYPE.INCREMENT})
-  } 
+  },[]); 
 
-  const decrement = () => {
-    dispatch({type: REDUCER_ACTION_TYPE.DECREMENT})
-  }
+  const decrement = useCallback(() => {
+    dispatch({ type: REDUCER_ACTION_TYPE.DECREMENT });
+  }, []); 
 
-  const handleTextInput = (event: ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: REDUCER_ACTION_TYPE.NEW_INPUT, payload: event.target.value});
-  };
+  const handleTextInput = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      dispatch({
+        type: REDUCER_ACTION_TYPE.NEW_INPUT,
+        payload: event.target.value,
+      });
+    },
+    []
+  );
 
   return {state, increment, decrement, handleTextInput}
 }
@@ -73,12 +81,49 @@ const initContextState: UseCounterContextType = {//? this is for the initial sta
 
 export const CounterContext = createContext<UseCounterContextType>(initContextState)
 
-export const counterProvider = ({
-  children, ...initState
-})
+type ChildrenType = {
+  children: ReactElement | undefined
+}
+
+export const CounterProvider = ({
+  children, ...initState 
+}: ChildrenType & StateType ): ReactElement  => {
+  return (
+    <CounterContext.Provider value={useCounterContext(initState)}>
+      {children}{" "}
+    </CounterContext.Provider>
+  );
+}
+
+type UseCounterHookType = {
+  count: number,
+  increment: () => void,
+  decrement: () => void
+}
+
+export const useCounter = (): UseCounterHookType => {
+
+  //* we need only count from the state. that's why we have State: {count}
+  const {state: {count}, increment, decrement} = useContext(CounterContext);
 
 
+  return {count, increment, decrement}
+};
 
+type UseCounterTextHookType = {
+  text: string,
+  handleTextInput: (e: ChangeEvent<HTMLInputElement> ) => void
+}
+
+export const useCounterText = (): UseCounterTextHookType => {
+  //* we need only text from the state. that's why we have State: {text}
+  const {
+    state: { text },
+    handleTextInput,
+  } = useContext(CounterContext);
+
+  return { text, handleTextInput };
+};
 
 
 
